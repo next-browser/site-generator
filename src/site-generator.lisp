@@ -597,7 +597,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "h"
                 :long-name "help"
-                :description "Print this help and exit."))
+                :description "Print this help."))
 
 (make-option
  (defun version ()
@@ -606,7 +606,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "v"
                 :long-name "version"
-                :description "Print version number and exit."))
+                :description "Print version number."))
 
 (make-option
  nil
