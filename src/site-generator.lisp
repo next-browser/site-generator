@@ -544,7 +544,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 
 (make-option
  (defun print-path ()
-   (print *path*))
+   (print (get-path)))
  (make-instance 'option
                 :short-name "o"
                 :long-name "print path"
@@ -628,5 +628,6 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
                (execute option)))))
 
 (defun get-path ()
-  (when (not *path*)
-    (set-path)))
+  (if (not *path*)
+      (set-path)
+      *path*))
