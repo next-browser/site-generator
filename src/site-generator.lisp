@@ -513,6 +513,8 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defparameter *user-selection* nil)
 (defparameter *prompt* "> ")
 (defparameter *path* nil)
+(defparameter *test-server-port* 4242)
+
 
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
@@ -545,6 +547,19 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
                 :short-name "l"
                 :long-name "path"
                 :description "Set the path for operations"))
+
+(make-option
+ (defun set-port ()
+   (print "Enter server port:")
+   (let ((inputted-port (read-line)))
+     (setf *test-server-port* inputted-port)
+     (when (equal inputted-port "")
+       (setf *test-server-port* 4242)))
+   (format t "Port set to ~s" *test-server-port*))
+ (make-instance 'option
+                :short-name "e"
+                :long-name "Port"
+                :description "Set the test server port."))
 
 (make-option
  (defun print-path ()
@@ -618,6 +633,16 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
                 :short-name "q"
                 :long-name "quit"
                 :description "Quit."))
+
+(make-option
+ (lambda ()
+   (run-test-server (get-path) *test-server-port*)
+   (generate-site (get-path)))
+ (make-instance 'option
+                :short-name "t"
+                :long-name "Test Server"
+                :description "Run Test Server"))
+
 
 (defun main (argv)
   (declare (ignore argv))
