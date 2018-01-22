@@ -516,54 +516,68 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
    (long-name :accessor long-name :initarg :long-name)
-   (description :accessor description :initarg :description)))
+   (description :accessor description :initarg :description)
+   (action :accessor action :initarg :action)))
 
 (defmethod print-object ((option option) stream)
   (format stream "Key: ~s Function: ~s" (short-name option) (description option)))
 
-(push
+(defmethod execute ((option option))
+  (funcall (action option)))
+
+(defmacro make-option (function-body option)
+  `(let ((fn-body ,function-body)
+         (option ,option))
+     (setf (action option) fn-body)
+     (push option *options*)))
+
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "i"
                 :long-name "init"
-                :description "Initialize a site-generator directory.")
- *options*)
-
-(push
+                :description "Initialize a site-generator directory."))
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "p"
                 :long-name "publish"
-                :description "Generate the site and publish it to the 'server' specified in the top-level config file.")
- *options*)
-(push
+                :description "Generate the site and publish it to the 'server' specified in the top-level config file."))
+
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "r"
                 :long-name "run-commands"
-                :description "Before generating the site, run any 'commands' that are set in the top-level config file.")
- *options*)
-(push
+                :description "Before generating the site, run any 'commands' that are set in the top-level config file."))
+
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "s"
                 :long-name "silence"
-                :description "Silence most output.")
- *options*)
-(push
+                :description "Silence most output."))
+
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "h"
                 :long-name "help"
-                :description "Print this help and exit.")
- *options*)
-(push
+                :description "Print this help and exit."))
+
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "v"
                 :long-name "version"
-                :description "Print version number and exit.")
- *options*)
-(push
+                :description "Print version number and exit."))
+
+(make-option
+ (defun print-lol () (print "lol"))
  (make-instance 'option
                 :short-name "q"
                 :long-name "quit"
-                :description "Quit.")
- *options*)
+                :description "Quit."))
 
 (defun main (argv)
   (declare (ignore argv))
@@ -571,7 +585,11 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
         do (print option))
   (loop while (not (equalp *user-selection* "q"))
         do (print *prompt*)
-           (setf *user-selection* (read-line))))
+           (setf *user-selection* (read-line))
+           (let ((option
+                   (find-if #'(lambda (element) (equalp *user-selection* (short-name element))) *options*)))
+             (when option
+               (execute option)))))
 
 ;; (defun main (argv)
 ;;   "String -> nil
