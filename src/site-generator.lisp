@@ -1,7 +1,6 @@
 (in-package :site-generator)
 
 (eval-when (:execute :load-toplevel :compile-toplevel)
-  (com.dvlsoft.clon:nickname-package) ; Create CLON nickname
   (enable-read-macros)) ; For local-time
 
 (setf (html-mode) :html5
@@ -510,70 +509,110 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 		   key page-file)))
     env))
 
+(defparameter *options* nil)
+(defparameter *user-selection* nil)
+(defparameter *prompt* "> ")
 
-;;;; ## Command line interface
-(clon:defsynopsis (:postfix "DIRECTORY")
-  (text :contents "site-generator is a static site generator. When called with no options, site-generator will generate the site-generator site that resides at DIRECTORY. When DIRECTORY is omitted, the path from which site-generator was called will be used.
+(defclass option ()
+  ((short-name :accessor short-name :initarg :short-name)
+   (long-name :accessor long-name :initarg :long-name)
+   (description :accessor description :initarg :description)))
 
-For more information, visit http://alex-charlton.com/projects/site-generator")
-  (flag :short-name "i" :long-name "init"
-	:description "Initialize a site-generator directory.")
-  (flag :short-name "p" :long-name "publish"
-	:description "Generate the site and publish it to the 'server' specified in the top-level config file.")
-  (lispobj :short-name "s" :long-name "test-server"
-	   :argument-type :optional
-	   :description "Lanch a test server for a site-generator site, updating the pages when files are changed on disk. Optionally accepts a value for the port on which the server listens."
-	   :fallback-value 4242
-	   :argument-name "PORT")
-  (flag :short-name "r" :long-name "run-commands"
-	:description "Before generating the site, run any 'commands' that are set in the top-level config file.")
-  (flag :short-name "q" :long-name "quiet"
-	:description "Silence most output.")
-  (flag :short-name "h" :long-name "help"
-	:description "Print this help and exit.")
-  (flag :short-name "v" :long-name "version"
-	:description "Print version number and exit."))
+(defmethod print-object ((option option) stream)
+  (format stream "Key: ~s Function: ~s" (short-name option) (description option)))
+
+(push
+ (make-instance 'option
+                :short-name "i"
+                :long-name "init"
+                :description "Initialize a site-generator directory.")
+ *options*)
+
+(push
+ (make-instance 'option
+                :short-name "p"
+                :long-name "publish"
+                :description "Generate the site and publish it to the 'server' specified in the top-level config file.")
+ *options*)
+(push
+ (make-instance 'option
+                :short-name "r"
+                :long-name "run-commands"
+                :description "Before generating the site, run any 'commands' that are set in the top-level config file.")
+ *options*)
+(push
+ (make-instance 'option
+                :short-name "s"
+                :long-name "silence"
+                :description "Silence most output.")
+ *options*)
+(push
+ (make-instance 'option
+                :short-name "h"
+                :long-name "help"
+                :description "Print this help and exit.")
+ *options*)
+(push
+ (make-instance 'option
+                :short-name "v"
+                :long-name "version"
+                :description "Print version number and exit.")
+ *options*)
+(push
+ (make-instance 'option
+                :short-name "q"
+                :long-name "quit"
+                :description "Quit.")
+ *options*)
 
 (defun main (argv)
-  "String -> nil
-Entry point. Perform the relevant action based on the command line options."
   (declare (ignore argv))
-  (in-package :site-generator)
-  (handler-case
-      (progn (clon:make-context)
-	     (when (clon:getopt :short-name "q")
-	       (setf *quiet* t))
-	     (let ((dir (get-site-dir)))
-	       (cond
-		 ((clon:getopt :short-name "h")
-		  (clon:help)
-		  (quit))
-		 ((clon:getopt :short-name "v")
-		  (version)
-		  (quit))
-		 ((clon:getopt :short-name "i")
-		  (init-site dir)
-		  (quit)))
-	       (when (clon:getopt :short-name "r")
-		 (run-commands dir))
-	       (when (clon:getopt :short-name "p")
-		 (publish-site dir)
-		 (quit))
-	       (if-let ((port (clon:getopt :short-name "s")))
-		 (run-test-server dir port) 
-		 (generate-site dir))))
-    (error (e) (format t "Error: ~a~%" e))))
+  (loop for option in *options*
+        do (print option))
+  (loop while (not (equalp *user-selection* "q"))
+        do (print *prompt*)
+           (setf *user-selection* (read-line))))
 
-(defun get-site-dir ()
-  "nil -> Pathname
-Return the path refereed to by the remainder of the command line options. If no path is specified, default to *DEFAULT-PATHNAME-DEFAULTS*."
-  (if-let ((remainder (clon:remainder)))
-    (canonical-pathname
-     (let ((dir (first remainder)))
-       (if (pathname-root-p dir)
-	dir
-	(merge-pathnames dir))))
-    *default-pathname-defaults*))
+;; (defun main (argv)
+;;   "String -> nil
+;; Entry point. Perform the relevant action based on the command line options."
+;;   (declare (ignore argv))
+;;   (in-package :site-generator)
+;;   (handler-case
+;;       (progn (clon:make-context)
+;; 	     (when (clon:getopt :short-name "q")
+;; 	       (setf *quiet* t))
+;; 	     (let ((dir (get-site-dir)))
+;; 	       (cond
+;; 		 ((clon:getopt :short-name "h")
+;; 		  (clon:help)
+;; 		  (quit))
+;; 		 ((clon:getopt :short-name "v")
+;; 		  (version)
+;; 		  (quit))
+;; 		 ((clon:getopt :short-name "i")
+;; 		  (init-site dir)
+;; 		  (quit)))
+;; 	       (when (clon:getopt :short-name "r")
+;; 		 (run-commands dir))
+;; 	       (when (clon:getopt :short-name "p")
+;; 		 (publish-site dir)
+;; 		 (quit))
+;; 	       (if-let ((port (clon:getopt :short-name "s")))
+;; 		 (run-test-server dir port) 
+;; 		 (generate-site dir))))
+;;     (error (e) (format t "Error: ~a~%" e))))
+
+;; (defun get-site-dir ()
+;;   "nil -> Pathname
+;; Return the path refereed to by the remainder of the command line options. If no path is specified, default to *DEFAULT-PATHNAME-DEFAULTS*."
+;;   (if-let ((remainder (clon:remainder)))
+;;     (canonical-pathname
+;;      (let ((dir (first remainder)))
+;;        (if (pathname-root-p dir)
+;; 	dir
+;; 	(merge-pathnames dir))))
+;;     *default-pathname-defaults*))
 
 (defun version ()
   "nil -> nil
