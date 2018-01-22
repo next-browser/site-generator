@@ -512,7 +512,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defparameter *options* nil)
 (defparameter *user-selection* nil)
 (defparameter *prompt* "> ")
-(defparameter *path* (uiop:getcwd))
+(defparameter *path* nil)
 
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
@@ -535,8 +535,12 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 
 (make-option
  (defun set-path ()
-   (print "Enter path:")
-   (setf *path* (uiop:physicalize-pathname (read-line))))
+   (print "Enter path (empty for current path):")
+   (let ((inputted-path (read-line)))
+     (setf *path* (uiop:physicalize-pathname inputted-path))
+     (when (equal inputted-path "")
+       (setf *path* (uiop:getcwd))))
+   (format t "Path set to ~s" *path*))
  (make-instance 'option
                 :short-name "l"
                 :long-name "path"
