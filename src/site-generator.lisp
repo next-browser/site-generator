@@ -512,7 +512,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defparameter *options* nil)
 (defparameter *user-selection* nil)
 (defparameter *prompt* "> ")
-(defparameter *path* nil)
+(defparameter *path* (uiop:getcwd))
 
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
