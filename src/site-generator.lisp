@@ -512,6 +512,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defparameter *options* nil)
 (defparameter *user-selection* nil)
 (defparameter *prompt* "> ")
+(defparameter *path* nil)
 
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
@@ -523,7 +524,8 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
   (format stream "Key: ~s Function: ~s" (short-name option) (description option)))
 
 (defmethod execute ((option option))
-  (funcall (action option)))
+  (when (action option)
+    (funcall (action option))))
 
 (defmacro make-option (function-body option)
   `(let ((fn-body ,function-body)
@@ -532,48 +534,82 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
      (push option *options*)))
 
 (make-option
- (defun print-lol () (print "lol"))
+ (defun set-path ()
+   (print "Enter path:")
+   (setf *path* (uiop:physicalize-pathname (read-line))))
+ (make-instance 'option
+                :short-name "l"
+                :long-name "path"
+                :description "Set the path for operations"))
+
+(make-option
+ (defun print-path ()
+   (print *path*))
+ (make-instance 'option
+                :short-name "o"
+                :long-name "print path"
+                :description "Print set path."))
+
+(make-option
+ (lambda ()
+   (init-site (get-path)))
  (make-instance 'option
                 :short-name "i"
                 :long-name "init"
                 :description "Initialize a site-generator directory."))
+
 (make-option
- (defun print-lol () (print "lol"))
+ (lambda ()
+   (publish-site (get-path)))
  (make-instance 'option
                 :short-name "p"
                 :long-name "publish"
                 :description "Generate the site and publish it to the 'server' specified in the top-level config file."))
 
 (make-option
- (defun print-lol () (print "lol"))
+ (lambda ()
+   (generate-site (get-path)))
+ (make-instance 'option
+                :short-name "g"
+                :long-name "generate"
+                :description "Generate the site."))
+
+(make-option
+ (lambda ()
+   (run-commands (get-path)))
  (make-instance 'option
                 :short-name "r"
                 :long-name "run-commands"
                 :description "Before generating the site, run any 'commands' that are set in the top-level config file."))
 
 (make-option
- (defun print-lol () (print "lol"))
+ (lambda ()
+   (setf *quiet* t))
  (make-instance 'option
                 :short-name "s"
                 :long-name "silence"
                 :description "Silence most output."))
 
 (make-option
- (defun print-lol () (print "lol"))
+ (defun print-help ()
+   (loop for option in *options*
+        do (print option)))
  (make-instance 'option
                 :short-name "h"
                 :long-name "help"
                 :description "Print this help and exit."))
 
 (make-option
- (defun print-lol () (print "lol"))
+ (defun version ()
+   (format t "site-generator version ~a.~a-~a~%"
+           +version-major+ +version-minor+ +version-release+))
  (make-instance 'option
                 :short-name "v"
                 :long-name "version"
                 :description "Print version number and exit."))
 
 (make-option
- (defun print-lol () (print "lol"))
+ nil
  (make-instance 'option
                 :short-name "q"
                 :long-name "quit"
@@ -591,49 +627,6 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
              (when option
                (execute option)))))
 
-;; (defun main (argv)
-;;   "String -> nil
-;; Entry point. Perform the relevant action based on the command line options."
-;;   (declare (ignore argv))
-;;   (in-package :site-generator)
-;;   (handler-case
-;;       (progn (clon:make-context)
-;; 	     (when (clon:getopt :short-name "q")
-;; 	       (setf *quiet* t))
-;; 	     (let ((dir (get-site-dir)))
-;; 	       (cond
-;; 		 ((clon:getopt :short-name "h")
-;; 		  (clon:help)
-;; 		  (quit))
-;; 		 ((clon:getopt :short-name "v")
-;; 		  (version)
-;; 		  (quit))
-;; 		 ((clon:getopt :short-name "i")
-;; 		  (init-site dir)
-;; 		  (quit)))
-;; 	       (when (clon:getopt :short-name "r")
-;; 		 (run-commands dir))
-;; 	       (when (clon:getopt :short-name "p")
-;; 		 (publish-site dir)
-;; 		 (quit))
-;; 	       (if-let ((port (clon:getopt :short-name "s")))
-;; 		 (run-test-server dir port) 
-;; 		 (generate-site dir))))
-;;     (error (e) (format t "Error: ~a~%" e))))
-
-;; (defun get-site-dir ()
-;;   "nil -> Pathname
-;; Return the path refereed to by the remainder of the command line options. If no path is specified, default to *DEFAULT-PATHNAME-DEFAULTS*."
-;;   (if-let ((remainder (clon:remainder)))
-;;     (canonical-pathname
-;;      (let ((dir (first remainder)))
-;;        (if (pathname-root-p dir)
-;; 	dir
-;; 	(merge-pathnames dir))))
-;;     *default-pathname-defaults*))
-
-(defun version ()
-  "nil -> nil
-Print the verion string."
-  (format t "site-generator version ~a.~a-~a~%"
-			  +version-major+ +version-minor+ +version-release+))
+(defun get-path ()
+  (when (not *path*)
+    (set-path)))
