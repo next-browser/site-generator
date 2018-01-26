@@ -546,7 +546,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "l"
                 :long-name "path"
-                :description "Set the path for operations"))
+                :description "Set project path."))
 
 (make-option
  (defun set-port ()
@@ -571,7 +571,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "u"
                 :long-name "output-path"
-                :description "Set the compiled files directory."))
+                :description "Set the compiled files path."))
 
 (make-option
  (defun print-path ()
@@ -579,7 +579,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "o"
                 :long-name "print-path"
-                :description "Print set path."))
+                :description "Print project path."))
 
 (make-option
  (lambda ()
@@ -653,7 +653,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "t"
                 :long-name "test-server"
-                :description "Run Test Server"))
+                :description "Run Test Server."))
 
 (make-option
  (defun run-script ()
@@ -661,7 +661,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "x"
                 :long-name "run-script"
-                :description "Run script located in cwd/make.lisp"))
+                :description "Run script located in cwd/make.lisp."))
 
 (defun main (argv)
   (declare (ignore argv))
