@@ -1,10 +1,9 @@
 ;;;; site-generator.asd
 
 (asdf:defsystem #:site-generator
-  :version "0.8.1"
+  :version "0.8.2"
   :serial t
-  :description "Describe site-generator here"
-  :author "Alex Charlton <alex.n.charlton@gmail.com>"
+  :description "site-generator is a static site generation tool."
   :license "BSD-2"
   :depends-on (:let-plus :alexandria :iterate :hunchentoot :cl-ppcre :cl-fad :bordeaux-threads :osicat :cl-who :local-time)
   :pathname "src"
@@ -22,7 +21,6 @@
 			     :site-generator)))
 
 (asdf:defsystem :site-generator-test
-  :author "Alex Charlton <alex.n.charlton@gmail.com>"
   :licence "BSD-3"
   :depends-on (:fiveam)
   :pathname "tests/"
