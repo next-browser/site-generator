@@ -21,13 +21,13 @@
 
 (defconstant +version-major+ 0)
 (defconstant +version-minor+ 8)
-(defconstant +version-release+ 1)
+(defconstant +version-release+ 2)
 
 ;;;; ## Primary interface
 ;; Directories site-generator expects
 (defvar *root-dir*)
 (defvar *content-dir*)
-(defvar *site-dir*)
+(defvar *site-dir* nil "The output directory of the site generation.")
 (defvar *template-dir*)
 (defvar *static-dir*)
 
@@ -102,9 +102,9 @@ Set the root directory of the site, and all corresponding directories."
   (setf *root-dir* (merge-pathnames (pathname-as-directory dir))
 	*DB-file* (merge-pathnames ".database" *root-dir*)
 	*content-dir* (merge-pathnames "content/" *root-dir*)
-	*site-dir* (merge-pathnames "site/" *root-dir*)
 	*template-dir* (merge-pathnames "templates/" *root-dir*)
 	*static-dir* (merge-pathnames "static/" *root-dir*))
+        *site-dir* (get-output-path *root-dir*)
   (cwd *root-dir*))
 
 (defun check-site ()
@@ -515,7 +515,6 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defparameter *path* nil)
 (defparameter *test-server-port* 4242)
 
-
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
    (long-name :accessor long-name :initarg :long-name)
@@ -558,15 +557,27 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
    (format t "Port set to ~s" *test-server-port*))
  (make-instance 'option
                 :short-name "e"
-                :long-name "Port"
+                :long-name "port"
                 :description "Set the test server port."))
+
+(make-option
+ (defun set-output-path ()
+   (print "Enter output path:")
+   (let ((inputted-path (read-line)))
+     (when (directory-exists-p (uiop:physicalize-pathname inputted-path))
+       (setf *site-dir* (uiop:physicalize-pathname inputted-path))))
+   (format t "Output path set to ~s" *site-dir*))
+ (make-instance 'option
+                :short-name "u"
+                :long-name "output-path"
+                :description "Set the compiled files directory."))
 
 (make-option
  (defun print-path ()
    (print (get-path)))
  (make-instance 'option
                 :short-name "o"
-                :long-name "print path"
+                :long-name "print-path"
                 :description "Print set path."))
 
 (make-option
@@ -574,7 +585,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
    (init-site (get-path)))
  (make-instance 'option
                 :short-name "i"
-                :long-name "init"
+                :long-name "initialize"
                 :description "Initialize a site-generator directory."))
 
 (make-option
@@ -640,23 +651,32 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
    (generate-site (get-path)))
  (make-instance 'option
                 :short-name "t"
-                :long-name "Test Server"
+                :long-name "test-server"
                 :description "Run Test Server"))
 
 
 (defun main (argv)
   (declare (ignore argv))
   (loop for option in *options*
-        do (print option))
+     do (print option))
   (loop while (not (equalp *user-selection* "q"))
-        do (print *prompt*)
-           (setf *user-selection* (read-line))
-           (let ((option
-                   (find-if #'(lambda (element) (equalp *user-selection* (short-name element))) *options*)))
-             (when option
-               (execute option)))))
+     do (print *prompt*)
+       (setf *user-selection* (read-line))
+       (let ((option
+              (find-if #'(lambda (element)
+                           (or
+                            (equalp *user-selection* (short-name element))
+                            (equalp *user-selection* (long-name element))))
+                       *options*)))
+         (when option
+           (execute option)))))
 
 (defun get-path ()
   (if (not *path*)
       (set-path)
       *path*))
+
+(defun get-output-path (directory)
+  (if (not *site-dir*)
+      (merge-pathnames "site/" directory)
+      *site-dir*))
