@@ -105,8 +105,8 @@ Set the root directory of the site, and all corresponding directories."
 	*DB-file* (merge-pathnames ".database" *root-dir*)
 	*content-dir* (merge-pathnames "content/" *root-dir*)
 	*template-dir* (merge-pathnames "templates/" *root-dir*)
-	*static-dir* (merge-pathnames "static/" *root-dir*))
-        *site-dir* (get-output-path *root-dir*)
+	*static-dir* (merge-pathnames "static/" *root-dir*)
+        *site-dir* (get-output-path *root-dir*))
   (cwd *root-dir*))
 
 (defun check-site ()
@@ -513,7 +513,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 
 (defparameter *options* nil)
 (defparameter *user-selection* nil)
-(defparameter *prompt* "> ")
+(defparameter *prompt* "site-generator> ")
 
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
@@ -522,7 +522,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
    (action :accessor action :initarg :action)))
 
 (defmethod print-object ((option option) stream)
-  (format stream "Key: ~s Function: ~s" (short-name option) (description option)))
+  (format stream "~A - ~A" (short-name option) (description option)))
 
 (defmethod execute ((option option))
   (when (action option)
@@ -541,7 +541,8 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
      (setf *path* (uiop:physicalize-pathname inputted-path))
      (when (equal inputted-path "")
        (setf *path* (uiop:getcwd))))
-   (format t "Path set to ~s" *path*))
+   (format t "Path set to ~s" *path*)
+   *path*)
  (make-instance 'option
                 :short-name "l"
                 :long-name "path"
@@ -594,7 +595,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "p"
                 :long-name "publish"
-                :description "Generate the site and publish it to the 'server' specified in the top-level config file."))
+                :description "Publish to the 'server' specified in the config."))
 
 (make-option
  (lambda ()
@@ -610,7 +611,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
  (make-instance 'option
                 :short-name "r"
                 :long-name "run-commands"
-                :description "Before generating the site, run any 'commands' that are set in the top-level config file."))
+                :description "Run any 'commands' that are set in the config."))
 
 (make-option
  (lambda ()
@@ -623,7 +624,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (make-option
  (defun print-help ()
    (loop for option in *options*
-        do (print option)))
+      do (print option)))
  (make-instance 'option
                 :short-name "h"
                 :long-name "help"
@@ -664,10 +665,9 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 
 (defun main (argv)
   (declare (ignore argv))
-  (loop for option in *options*
-     do (print option))
+  (print-help)
   (loop while (not (equalp *user-selection* "q"))
-     do (print *prompt*)
+     do (format t "~%~A" *prompt*)
        (setf *user-selection* (read-line))
        (let ((option
               (find-if #'(lambda (element)
