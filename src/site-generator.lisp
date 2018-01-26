@@ -25,6 +25,8 @@
 
 ;;;; ## Primary interface
 ;; Directories site-generator expects
+(defparameter *path* nil "The path the site to be generated is located in.")
+(defparameter *test-server-port* 4242)
 (defvar *root-dir*)
 (defvar *content-dir*)
 (defvar *site-dir* nil "The output directory of the site generation.")
@@ -512,8 +514,6 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 (defparameter *options* nil)
 (defparameter *user-selection* nil)
 (defparameter *prompt* "> ")
-(defparameter *path* nil)
-(defparameter *test-server-port* 4242)
 
 (defclass option ()
   ((short-name :accessor short-name :initarg :short-name)
@@ -535,7 +535,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
      (push option *options*)))
 
 (make-option
- (defun set-path ()
+ (defun set-prompt-path ()
    (print "Enter path (empty for current path):")
    (let ((inputted-path (read-line)))
      (setf *path* (uiop:physicalize-pathname inputted-path))
@@ -561,7 +561,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
                 :description "Set the test server port."))
 
 (make-option
- (defun set-output-path ()
+ (defun set-prompt-output-path ()
    (print "Enter output path:")
    (let ((inputted-path (read-line)))
      (when (directory-exists-p (uiop:physicalize-pathname inputted-path))
@@ -654,6 +654,13 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
                 :long-name "test-server"
                 :description "Run Test Server"))
 
+(make-option
+ (defun run-script ()
+   (load (uiop:merge-pathnames* "make.lisp" (uiop:getcwd))))
+ (make-instance 'option
+                :short-name "x"
+                :long-name "run-script"
+                :description "Run script located in cwd/make.lisp"))
 
 (defun main (argv)
   (declare (ignore argv))
@@ -673,7 +680,7 @@ Parse a page content file using PARSE-CONTENT and throw errors if any settings a
 
 (defun get-path ()
   (if (not *path*)
-      (set-path)
+      (set-prompt-path)
       *path*))
 
 (defun get-output-path (directory)
