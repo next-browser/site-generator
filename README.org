@@ -108,15 +108,16 @@ called =site= will be created. The directory that contains these folders
 is the sum of your site-generator site.
 
 You can create a fresh site-generator site by running the command
-=site-generator --init [DIRECTORY]= or =site-generator -i [DIRECTORY]=.
-For all site-generator commands, if the directory is omitted, the path
-from which the command was run will be considered the directory.
+~initialize~ within site-generator.  For all site-generator commands,
+if the directory is omitted, the path from which the command was run
+will be considered the directory.n
 
 So, the site-generator directory of the /example site/ could be
 created by running the command:
 
 #+BEGIN_EXAMPLE
-    site-generator --init example-site
+    site-generator RET
+    i
 #+END_EXAMPLE
 
 It might be a good idea to track and version the content of your site.
