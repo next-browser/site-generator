@@ -1,6 +1,6 @@
 * Introduction
 
-/site-generator/ is a command-line application for static site
+site-generator is a command-line application for static site
 generation.
 
 Static site generators combine content with HTML templates to create
@@ -20,7 +20,7 @@ And since serving static pages requires less processing, static sites
 will be faster and use less memory, which means they can handle more
 traffic than a comparable dynamic site.
 
-/site-generator/ was motivated by the apparent lack of static site
+site-generator was motivated by the apparent lack of static site
 generators that are able to deal with arbitrary content. While being
 able to input a title, author, date, and content for each of your pages
 is nice if you have a blog, the ability to generate any pages that are
@@ -30,49 +30,44 @@ bunch of HTML into a file that is meant for content. If other pages were
 to share this HTML, it would have to be duplicated. This is clearly not
 solving the problem that a site generator should.
 
-So /site-generator/ solves this problem by making you decide what
+So site-generator solves this problem by making you decide what
 content your site is made of. Behind every page in your site is a
 /content file/ in which you associate your content with variables. These
 variables can then be used pretty much anywhere [1] with
-/site-generator/'s powerful templating syntax. With this power comes
-responsibility, though. /site-generator/ is much more powerful than most
+site-generator's powerful templating syntax. With this power comes
+responsibility, though. site-generator is much more powerful than most
 static site generators, and is therefore more dangerous.
 
-The other area in which /site-generator/ excels is its support for
+The other area in which site-generator excels is its support for
 content in multiple languages. Content can be specified, in the same
-content file, in as many languages as you want, and /site-generator/
+content file, in as many languages as you want, and site-generator
 will create a site for each language.
 
-/site-generator/ was written for advanced users. It does not do anything
+site-generator was written for advanced users. It does not do anything
 to safeguard against bad practises. It is only a tool for combining
 content with templates, with some conveniences. People who know Common
-Lisp will get the most out of /site-generator/, since CL is the language
-with which /site-generator/ can be extended. Knowing Common Lisp is not
-a prerequisite for using /site-generator/, however. The documentation
+Lisp will get the most out of site-generator, since CL is the language
+with which site-generator can be extended. Knowing Common Lisp is not
+a prerequisite for using site-generator, however. The documentation
 explains all of the CL required to build pretty much any site (it's not
 much).
 
-/site-generator/ was written in Common Lisp. It would not have been
+site-generator was written in Common Lisp. It would not have been
 possible without the many excellent Common Lisp libraries it uses, not
 to mention the excellent open source CL implementations. Many thanks to
 their creators!
 
-The /site-generator/ test-suite can be run with
+The site-generator test-suite can be run with
 =(asdf:test-system :site-generator)=.
-
-This documentation is easiest to read at
-[[http://alex-charlton.com/projects/site-generator/][/site-generator/'s
-home]].
 
 * Features
 
 -  Accepts arbitrary data in content pages
 -  Support for content written in multiple languages
 -  Templates can expand Common Lisp expressions in arbitrary CL
-   environments making the functionality of /site-generator/ infinitely
+   environments making the functionality of site-generator infinitely
    expandable (to people who can program in Common Lisp, at least)
--  Conversion of markup with
-   [[http://johnmacfarlane.net/pandoc/][Pandoc]]
+-  Conversion of markup with [[http://johnmacfarlane.net/pandoc/][Pandoc]]
 -  Support for aggregate pages like archives and RSS feeds
 -  Site previewing with [[http://weitz.de/hunchentoot/][Hunchentoot]]
 -  Publishing with [[http://rsync.samba.org/][Rsync]]
@@ -81,66 +76,43 @@ home]].
 -  Execution of arbitrary commands before publishing (e.g. to compile
    Javascript or CSS)
 
-* Getting /site-generator/
+* Getting site-generator
+** Creating a stand-alone site-generator
 
-Using a stand-alone version of /site-generator/ is the easiest way to
-get started. Just download the executable file
-([[http://alex-charlton.com/static/downloads/Linux/site-generator][Linux
-(64 bit)]],
-[[http://alex-charlton.com/static/downloads/Mac/site-generator][Mac]])
-and place it in a directory that is in your =PATH=. Make sure you have
-[[http://rsync.samba.org/][Rsync]] and
-[[http://johnmacfarlane.net/pandoc/][Pandoc]] installed on your computer
-if you want to use the publish or markup features.
+If you want to use a development version of site-generator, you can
+create a stand-alone executable file by running the file
+=make.sh=. This script relies on [[http://www.quicklisp.org/][Quicklisp]] and [[http://www.xach.com/lisp/buildapp/][Buildapp.]], and
+consequentially The script must be modified to point to your Quicklisp
+directory [2].
 
-** Source
-
-The BSD licenced source code for /site-generator/ can be found on
-[[https://github.com/AlexCharlton/site-generator][GitHub]].
-
-** Creating a stand-alone /site-generator/
-
-If you want to use a development version of /site-generator/, you can
-create a stand-alone executable file by running the file =make.sh=. This
-script relies on [[http://www.quicklisp.org/][Quicklisp]],
-[[http://www.xach.com/lisp/buildapp/][Buildapp]], and consequentially
-[[http://www.sbcl.org/][SBCL]]. The script must be modified to point to
-your Quicklisp directory [2].
-
-** Bugs
-
-To see known bugs or to report new ones, go to /site-generator/'s
-[[https://github.com/AlexCharlton/site-generator/issues][issue
-tracker]].
-
-* Using /site-generator/
+* Using site-generator
 
 This tutorial will explain in detail the use of the most important
 commands you need to make a website. To see help regarding the commands
-offered by /site-generator/, use the command =site-generator --help=.
+offered by site-generator, use the command =help=.
+
 For more information on any of the variables or functions used in the
 tutorial, see the appendices.
 
 Two example sites will be worked through in this tutorial: an /example
-site/ and an /example blog/. These sites can be found in the
-[[https://github.com/AlexCharlton/site-generator/tree/master/examples][=examples/=]]
-directory of /site-generator/'s source.
+site/ and an /example blog/. These sites can be found in the examples
+directory of site-generator's source.
 
 ** Initialization
 
-/site-generator/ uses a particular directory structure to organize your
+site-generator uses a particular directory structure to organize your
 site. Specifically, it relies on the existence of three directories:
 =content=, =templates=, and =static=. Inside =content= it expects a file
 called =config=. Additionally, when your site is generated, a directory
 called =site= will be created. The directory that contains these folders
-is the sum of your /site-generator/ site.
+is the sum of your site-generator site.
 
-You can create a fresh /site-generator/ site by running the command
+You can create a fresh site-generator site by running the command
 =site-generator --init [DIRECTORY]= or =site-generator -i [DIRECTORY]=.
-For all /site-generator/ commands, if the directory is omitted, the path
+For all site-generator commands, if the directory is omitted, the path
 from which the command was run will be considered the directory.
 
-So, the /site-generator/ directory of the /example site/ could be
+So, the site-generator directory of the /example site/ could be
 created by running the command:
 
 #+BEGIN_EXAMPLE
@@ -148,16 +120,15 @@ created by running the command:
 #+END_EXAMPLE
 
 It might be a good idea to track and version the content of your site.
-Adding the contents of =content=, =templates=, and =static= to a source
-control system such as [[http:/gitscm.org][git]] would accomplish this
-goal. =site= does not need to be added, as it is created by
-/site-generator/ from the other directories. Tracking the file
-=.database=, which is created after the first run of /site-generator/,
-is also not a bad idea.
+Adding the contents of =content=, =templates=, and =static= to a
+source control system such as [[http:/gitscm.org][git]] would accomplish this goal. =site=
+does not need to be added, as it is created by site-generator from the
+other directories. Tracking the file =.database=, which is created
+after the first run of site-generator, is also not a bad idea.
 
 ** Creating sites
 
-As previously hinted at, a /site-generator/ site is made of three kinds
+As previously hinted at, a site-generator site is made of three kinds
 of files: /content/ files /template/ files, and /static/ files.
 
 Content files are the files that contain the actual content of your
@@ -250,7 +221,7 @@ content file, we write:
 While this looks the same as the content variable definitions that we
 made before, this is a special variable called a /configuration
 variable/. A fixed set of variable names are reserved by
-/site-generator/, and they are used to configure the way a site behaves.
+site-generator, and they are used to configure the way a site behaves.
 =template= is one such configuration variable, and we'll see more soon.
 Almost all configuration variables differ from content variables in that
 they are the same for all languages. Because of this, if we were to
@@ -278,7 +249,7 @@ latter behaviour, it can be controlled with the configuration variable
 [[#appendix-a-configuration-variables][appendix A]]). Second, we notice
 that the name of the page was inherited from the title that was set in
 the content file (albeit with an underscore in the place of the space,
-since you can't have spaces in URLs). /site-generator/ recognizes the
+since you can't have spaces in URLs). site-generator recognizes the
 page's =title= as special, and will set it as the output page's path. If
 there was no =title= variable set, then the content file's file name
 would have been used instead (e.g.
@@ -322,7 +293,7 @@ Now all of the content files in the site know that =site-name= is equal
 to =site-generator=.
 
 We should also tell the site what languages it should be generating. By
-default, /site-generator/ will only generate one language -- the default
+default, site-generator will only generate one language -- the default
 language. We can set the languages it should generate to :
 
 #+BEGIN_EXAMPLE
@@ -332,7 +303,7 @@ language. We can set the languages it should generate to :
 
 =languages= is a configuration variable that can only be set in the
 top-level config file. It's noteworthy that the language codes we're
-using are arbitrary. By default, /site-generator/ only knows the code
+using are arbitrary. By default, site-generator only knows the code
 =en=, and you don't even have to use it. The language codes are just
 indicators, for you, of what language a particular thing is. Any string
 can be used for a language code (although case won't be preserved). The
@@ -348,7 +319,7 @@ that we can't be bothered to write out the HTML for this navigation bar,
 so we're going to create this bar in
 [[http://daringfireball.net/projects/markdown/][Markdown]]. Markdown is
 just one of the many markup languages that
-[[http://johnmacfarlane.net/pandoc/][Pandoc]] -- /site-generator/'s
+[[http://johnmacfarlane.net/pandoc/][Pandoc]] -- site-generator's
 markup tool -- can parse. The navigation bar will consist of an
 unordered list of links that we will write in our
 =example-site/content/config= file like this:
@@ -388,7 +359,7 @@ But instead we'll add some new lines:
     :content markup=markdown
 #+END_EXAMPLE
 
-This tells /site-generator/ that the default values of =markup= for
+This tells site-generator that the default values of =markup= for
 =nav= (and =content=) will be =markdown=.
 
 Alternately we could have written:
@@ -401,7 +372,7 @@ Alternately we could have written:
 To set the global value of =markup=.
 
 Pandoc can do a good deal of things and interpret a lot of markup
-languages. /site-generator/ provides a number of configuration variables
+languages. site-generator provides a number of configuration variables
 (or arguments to content variables) to affect its input. The main two
 are =markup= and =output-format= which tell Pandoc how to interpret its
 input, and what language to output to. The values of these can be almost
@@ -410,7 +381,7 @@ supports]] as input and output formats. [3]
 
 The remainder of the Pandoc configuration variables try to cover most of
 the other options that are both supported by Pandoc and that make sense
-in the context of /site-generator/. The full list of them can be seen in
+in the context of site-generator. The full list of them can be seen in
 [[#appendix-c-pandoc-configuration-variables][appendix C]].
 
 *** Wrapping up the example site content
@@ -556,7 +527,7 @@ content pages:
 
 Now, for the language selection, we want some code that will output a
 list of links that point to the current page but in a different
-language. /site-generator/ provides a function to do so called
+language. site-generator provides a function to do so called
 =other-languages=. To call this function, we need to use a /template
 expression/ which is a set of parentheses containing the desired
 expression (written in Common Lisp), preceded by a dollar sign. So our
@@ -660,7 +631,7 @@ contains them, so we escape the quotation marks with a backslash.
 
 Speaking of escaping with backslashes, this is also how we escape
 template variables and expressions. So =\$hi$= will be output as =$hi$=
-when it gets run through /site-generator/, and the variable =hi= won't
+when it gets run through site-generator, and the variable =hi= won't
 be expanded. Most of the time, you don't need to escape dollar signs,
 though. The only times dollar signs need to be escaped is when they
 might be interpreted as a template variable or expression, and you don't
@@ -671,7 +642,7 @@ surrounding a string without whitespace.
 We've gone a bit crazy with the English footer. The first part is the
 same as the French footer-- we're only doing something when =title= is
 bound -- but the rest includes a call to =markup=. =markup= is the
-function that /site-generator/ uses to run text through Pandoc. In this
+function that site-generator uses to run text through Pandoc. In this
 case, we're passing it the string
 ="TITLE-TEXT" (these should be curly quotes)=, and we're setting the
 =output-format= to =markdown= and the =markup= to =markdown=. Why would
@@ -755,11 +726,9 @@ Instead of the =<article>= tag, we have put the content in side a
 that =div=, that will always appear in that template.
 
 That concludes our first site! The full site can be seen in the
-[[https://github.com/AlexCharlton/site-generator/tree/master/examples/example-site][=examples/example-site/=]]
-directory of the source. Go to the section
-[[#generating-the-site][Generating the site]] to learn how to generate
-the actual site, or continue on to see how you can use /site-generator/
-to create a blog.
+examples directory of the source. Go to the section [[#generating-the-site][Generating the
+site]] to learn how to generate the actual site, or continue on to see
+how you can use site-generator to create a blog.
 
 *** An example blog
 
@@ -788,7 +757,7 @@ Lisp. Specifically, using [[http://weitz.de/cl-who/][CL-WHO]]. The file
 #+END_EXAMPLE
 
 So what's going on here? First, the template expression consists of
-=$(xml ...)=. =xml= is /site-generator/'s way of denoting that the
+=$(xml ...)=. =xml= is site-generator's way of denoting that the
 following code is going to represent a tree of XML (which HTML is). All
 of the "functions" in that tree (=:html= =:head=, =:body=, etc.) will
 become HTML tags. Like HTML, these expressions are nested. Attributes of
@@ -898,10 +867,10 @@ current page, but we could refer to another page, such as ="index"=.
 
 *** Dates
 
-Dates in /site-generator/ are complicated enough that they deserve some
+Dates in site-generator are complicated enough that they deserve some
 more discussion. First, you might notice that in =second=, we define
 =date= to be =day=17=. In =third= we decline to set =date= to anything
-at all. By default, /site-generator/ will set the date of the page to
+at all. By default, site-generator will set the date of the page to
 the modification time of the file when the site was first generated.
 That means that the date output by =page-date= will stay the same even
 after the content file is modified, as long as the site has been
@@ -1065,7 +1034,7 @@ one twist:
 #+END_EXAMPLE
 
 We're defining =contents= as expected, but in it we're referencing the
-function =foo=. What's =foo=? =foo= isn't provided by /site-generator/.
+function =foo=. What's =foo=? =foo= isn't provided by site-generator.
 In fact, it doesn't exist until it is defined later in that content
 file:
 
@@ -1082,7 +1051,7 @@ using =defun= which has the syntax
 =(defun FUNCTION-NAME (ARGS) EXPRESSIONS)=. =foo= just returns the
 string ="I'm a function!"=, so it isn't particularly useful. You could
 use any Common Lisp functions you want, in =cl-environment=, including
-loading Lisp files. By doing so, /site-generator/ can be extended to do
+loading Lisp files. By doing so, site-generator can be extended to do
 pretty much anything. While we can't give a full tutorial on how to use
 Common Lisp, we recommend reading
 [[http://www.gigamonkeys.com/book/][Practical Common Lisp]] in order to
@@ -1155,13 +1124,13 @@ How about an RSS feed for this blog? We create the file
 #+END_EXAMPLE
 
 Simple enough. The only new thing is the =extension=. This configuration
-variable prevents /site-generator/ from outputting an =.html= file and
+variable prevents site-generator from outputting an =.html= file and
 will instead force it to output a =.EXTENSION= file. In this case, we'll
 be generating the page =example-blog/site/rss.xml=.
 
 Also notable is that we set the template to =rss.lisp=. Templates don't
 need to have any particular extension, so since we'll be writing this
-template mostly in Lisp (even though it is still a /site-generator/
+template mostly in Lisp (even though it is still a site-generator
 template file) we might as well let our editor know how to handle it. In
 =example-blog/templates/rss.lisp=, we write:
 
@@ -1231,10 +1200,8 @@ be linked to =example-blog/site/static/=, where any page can access it.
 The static folder is consequentially the place to put any CSS files,
 Javascript files, and images.
 
-Our blog is now ready to be generated! The full sources for this example
-blog can be found in the
-[[https://github.com/AlexCharlton/site-generator/tree/master/examples/example-blog][=examples/example-blog/=]]
-directory of the source.
+Our blog is now ready to be generated! The full sources for this
+example blog can be found in the examples directory of the source.
 
 ** Generating the site
 
@@ -1271,13 +1238,11 @@ particular set of content changes.
 
 ** Using the test server
 
-When /site-generator/ is run with the =--test-server= flag
-(=site-generator -s[PORT] [DIRECTORY]= or
-=site-generator --test-server=[PORT] [DIRECTORY]=), it will launch a
-test server that hosts your site at the optionally specified PORT. You
-can access this site through the address that is printed out to the
-command-line. Previewing your site in this manner is a handy way of
-seeing what the pages of your site look like before publishing.
+When site-generator is run, you have the option of using ~t~ to launch
+a test server that hosts your site at the optionally specified
+PORT. You can access this site through the address that is printed out
+to the command-line. Previewing your site in this manner is a handy
+way of seeing what the pages of your site look like before publishing.
 
 When the test server is running, your site will be constantly scanned
 for changes. If changes are detected, then the relevant pages will be
@@ -1289,24 +1254,23 @@ command-line, while the server is running, will cleanly exit the server.
 
 ** Publishing the site
 
-When /site-generator/ is run with the =--publish= flag
-(=site-generator -p [DIRECTORY]=), it will generate your site then push
-it to the server specified in your top-level config file by the variable
-=:server=. The server string should be an Rsync compatible string
-specifying your username, server address, and the directory on the
-server into which the site should be loaded. This string is in the form
-of: =username@server:dir=. E.g.:
+When site-generator invokes the =publish= command it will generate
+your site then push it to the server specified in your top-level
+config file by the variable =:server=. The server string should be an
+Rsync compatible string specifying your username, server address, and
+the directory on the server into which the site should be loaded. This
+string is in the form of: =username@server:dir=. E.g.:
 
 #+BEGIN_EXAMPLE
     :server
     alexcharlton@alex-charlton.com:alex-charlton.com/
 #+END_EXAMPLE
 
-Be careful, though: /site-generator/ deletes any content that is present
+Be careful, though: site-generator deletes any content that is present
 in that directory on the server! If you have files you don't want to
 touch, you can add one or more files or directories to the =:exclude=
 variable. This should be a line separated list of Rsync patterns.
-=:exclude= will also prevent /site-generator/ from uploading any files
+=:exclude= will also prevent site-generator from uploading any files
 or directories that you don't want to. E.g.:
 
 #+BEGIN_EXAMPLE
@@ -1323,12 +1287,12 @@ server that you don't want deleted, and you also don't want to upload
 
 Sometimes, your site may depend on having some other commands run for it
 to be built properly. A common example of this is needing to compile
-CoffeeScript, et al., to Javascript. /site-generator/ makes it easy to
+CoffeeScript, et al., to Javascript. site-generator makes it easy to
 automate these commands through the =:commands= variable, which must be
 placed in the top-level config file.
 
 =:commands= is processed as a list of command-line commands, separated
-by newlines. Each command is run with the /site-generator/ directory as
+by newlines. Each command is run with the site-generator directory as
 the current directory. Newlines can be escaped with backslashes. E.g.:
 
 #+BEGIN_EXAMPLE
@@ -1348,11 +1312,10 @@ with an escaped newline, if desired). E.g.:
     echo "CoffeeScript file compiled"
 #+END_EXAMPLE
 
-When /site-generator/ is run with the =--run-commands= flag
-(=site-generator -r [DIRECTORY]=), the commands specified by =:commands=
-will be run. From the previous example, this means that the file
-=coffee-script/hello.coffee= will be compiled and output to the
-directory =static/js/=, after which the string
+When the site-generator =run-commands= option is invoked, the commands
+specified by =:commands= will be run. From the previous example, this
+means that the file =coffee-script/hello.coffee= will be compiled and
+output to the directory =static/js/=, after which the string
 =CoffeeScript file compiled= will be printed out to the terminal.
 
 * Appendices
@@ -1360,14 +1323,14 @@ directory =static/js/=, after which the string
 ** Appendix A -- Configuration variables
 
 Configuration variables are variables that are defined in config or
-content files that have special meaning to /site-generator/. The list
+content files that have special meaning to site-generator. The list
 below describes how the content of each of these variables is
 interpreted.
 
 -  =:cl-environment=: Common Lisp code that is evaluated before the
    content file is generated into a page.
 -  =:commands=: Line separated command-line commands that are executed
-   when /site-generator/ is passed the =--run-commands= flag. Newlines
+   when site-generator is passed the =run-commands= flag. Newlines
    can be backslash escaped. May only be defined in the top-level config
    file.
 -  =:date=: A list of =unit=value= pairs which are used to modify the
@@ -1401,7 +1364,7 @@ interpreted.
    highlight code blocks that have a language specified. The
    highlighting will only be visible with an appropriate CSS file. See
    the
-   [[https://github.com/AlexCharlton/site-generator/tree/master/examples/code-highlight.css][example
+   [[https://github.com/AlexCharltonsite-generatortree/master/examples/code-highlight.css][example
    code highlighting CSS file]]. Defaults to =true=.
 -  =:languages=: A space or comma separated list of language codes. A
    site for every language code listed will be generated. Defaults to
@@ -1423,7 +1386,7 @@ interpreted.
    =true=. May only be defined in the top-level config file.
 -  =:server=: The string understood by Rsync that represents the
    =username@server-address:directory= to which the site will be
-   uploaded when /site-generator/ is passed the =--publish= flag.
+   uploaded when site-generator is passed the =--publish= flag.
 -  =:slug=: The string that will be used to represent the URL of the
    page of the content file in which =slug= was defined. May only be
    defined in a content file.
@@ -1447,7 +1410,7 @@ interpreted.
    =cl site-generator cl-who=.
 
 Additionally, the variables =lang= and =current-file= are reserved by
-/site-generator/ and may not be defined in any content file.
+site-generator and may not be defined in any content file.
 
 ** Appendix B -- Supplied functions
 
@@ -1551,7 +1514,7 @@ separate lines). They are explained in more detail in appendix A.
 -  =toc=
 -  =toc-depth=
 
-** Appendix D -- /site-generator/ syntax
+** Appendix D -- site-generator syntax
 
 Templates contain =$template-variables$= and =$(template expressions)=.
 When templates are expanded, these are replaced with the value of the
@@ -1607,79 +1570,3 @@ to Common Lisp's =nil=, e.g.:
 Content files are located in the =content/= directory. They may possess
 any name except for those starting with a =.= (i.e. hidden files) or
 bracketed by =#= symbols (i.e. Emacs auto-save files).
-
-** Appendix E -- Changelog
-
-*** v0.8.0
-
--  Add =static-files=
-
-*** v0.7.0
-
--  Add ability to exclude files/directories while publishing
-
-*** v0.6.0
-
--  Commands are run asynchronously
-
-*** v0.5.0
-
--  Test server listens to 0.0.0.0 rather than 127.0.0.1
-
-*** v0.4.0
-
--  Config files can now contain comments
-
-*** v0.3.0
-
--  Make sure =static= directory stays current
--  Fix bug with time setting
-
-*** v0.2.0
-
--  Add support for moving and deleting content files
--  Bugfixes
-
-*** v0.1.0
-
--  Initial release
-
-[1] But they should probably be used mostly in /template files/.
-
-[2] Otherwise, you could overhaul the script.
-
-[3] Some output formats obviously won't make much sense -- why would you
-    be outputting to a Word doc?
-
-[4] Keyword arguments are generally known as "named arguments" in other
-    languages.
-
-[5] We could have also written the above =when= expression using =if=,
-    which has the syntax
-    =(if TEST-EXPRESSION TRUE-EXPRESSION FALSE-EXPRESSION)=:
-
-    #+BEGIN_EXAMPLE
-        <title>$(if (bound? title)
-                (echo title " — " site-name)
-                site-name)
-        </title>
-    #+END_EXAMPLE
-
-[6] The last modification time of the file can be accessed with the
-    similar function =page-last-modified=.
-
-[7] These keywords are inherited from the underlying time library that
-    /site-generator/ uses:
-    [[http://common-lisp.net/project/local-time/manual.html][local-time]].
-
-[8] Actually a macro is created, but this is of little consequence.
-
-[9] We could choose to do so, but then we'd need another =xml= function
-    in place of the =htm=
-
-[10] The full syntax of =loop= is
-     [[http://www.lispworks.com/documentation/HyperSpec/Body/06_a.htm][pretty
-     complex]], but this should suffice for most sites. Practical Common
-     Lisp has a
-     [[http://www.gigamonkeys.com/book/loop-for-black-belts.html][good
-     introduction]] to this crazy macro.
