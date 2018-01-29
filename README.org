@@ -117,7 +117,7 @@ created by running the command:
 
 #+BEGIN_EXAMPLE
     site-generator RET
-    i
+    i RET
 #+END_EXAMPLE
 
 It might be a good idea to track and version the content of your site.
