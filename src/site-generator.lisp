@@ -448,7 +448,7 @@ Given a pathspec, return a string that is a valid URI. Subsitutes non-accented c
     (iter (for (regex . replace) in replace-list)
 	  (for str initially (namestring slug) then new)
 	  (for new = (regex-replace-all regex str replace))
-	  (finally (return new)))))
+	  (finally (return (string-downcase new))))))
 
 (defun add-slugs (slug-new slug-old)
   "Plist Plist -> Plist
