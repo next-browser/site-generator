@@ -17,7 +17,8 @@
   "Pathspec -> nil
 Ensure that a file exists."
   (with-open-file (s file
-		     :if-does-not-exist :create)))
+		     :if-does-not-exist :create)
+    (declare (ignore s))))
 
 (defun directory-minus (path dir)
   "Pathspec Pathspec -> Pathname
