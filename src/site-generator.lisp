@@ -420,7 +420,7 @@ Return a plist of the relative paths of the pages for FILE, given its SLUGS. Thi
 (defun slugify (slug)
   "Pathspec -> String
 Given a pathspec, return a string that is a valid URI. Subsitutes non-accented characters for accented ones, and replaces spaces with underscores."
-  (let ((replace-list '(("\\s+" . "_")
+  (let ((replace-list '(("\\s+" . "-")
 			("[‘’]" "'")
 			("[“”]" "\"")
 			("—" "-")
