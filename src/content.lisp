@@ -1,20 +1,56 @@
 (in-package :site-generator)
-;;;; ## Site content
-;;;; The site's content (and configuration) is parsed from text files (a.k.a. content files). Lines beginning with a keyword denote a variable, and the next lines before the next keyword are the content of that variable. Additionally, keywords may have further key-value pairs, strings separated by equals (e.g. foo=bar), after them.
+;;;; ## Site content The site's content (and configuration) is parsed
+;;;; from text files (a.k.a. content files). Lines beginning with a
+;;;; keyword denote a variable, and the next lines before the next
+;;;; keyword are the content of that variable. Additionally, keywords
+;;;; may have further key-value pairs, strings separated by equals
+;;;; (e.g. foo=bar), after them.
 
-;;;; While the syntax is the same, there are really two sorts of variables that are stored in content files, content and configuration. The combination of the two will be referred to, regrettably, as "data".
+;;;; While the syntax is the same, there are really two sorts of
+;;;; variables that are stored in content files, content and
+;;;; configuration. The combination of the two will be referred to,
+;;;; regrettably, as "data".
 
-;;;; Content is the text that can be inserted into a template. As such, it can be configured to behave in a number of ways through the use of additional arguments. For example:
+;;;; Content is the text that can be inserted into a template. As
+;;;; such, it can be configured to behave in a number of ways through
+;;;; the use of additional arguments. For example:
+
 ;;;; :content markup=markdown
 ;;;; Hello world!
-;;;; Associates the string "Hello world!" with the variable `content`. Additionally, this content will be interpreted as markdown. Content is segregated into languages, with each piece of language-associated content able to have a different configuration. In the previous example, the content "Hello world!", as well as the fact that it is markdown, would be associated with :EN, the default language. A new piece of data:
+
+;;;; Associates the string "Hello world!" with the variable
+;;;; `content`. Additionally, this content will be interpreted as
+;;;; markdown. Content is segregated into languages, with each piece
+;;;; of language-associated content able to have a different
+;;;; configuration. In the previous example, the content "Hello
+;;;; world!", as well as the fact that it is markdown, would be
+;;;; associated with :EN, the default language. A new piece of data:
+
 ;;;; :content lang=fr markup=none
+
 ;;;; Salut, monde!
-;;;; Would associate the string "Salut, monde!" again with the variable `content`, but this time with the language :FR, and the markup is understood to be none. If no content is associated with a given variable in any language other than the default, when other languages are printed, the content associated with the default language will be used.
 
-;;;; Configuration, on the other hand, exists the same in every language. Their interpretation is not modified by any arguments so key-value pairs on the same line as the configuration variable declaration are ignored. Depending on the variable, the lines following will be interpreted differently. A detailed explanation of the configuration variables can be seen in the README.
+;;;; Would associate the string "Salut, monde!" again with the
+;;;; variable `content`, but this time with the language :FR, and the
+;;;; markup is understood to be none. If no content is associated with
+;;;; a given variable in any language other than the default, when
+;;;; other languages are printed, the content associated with the
+;;;; default language will be used.
 
-;;;; Two pieces of configuration are unlike the others in that they also have languages associated with them: :SLUG and :DIRECTORY-SLUG. These are the strings that the URLS for a given page are created with, :SLUG being the URL-name of an actual page, while :DIRECTORY-SLUG is the URL-name of the directory in which pages reside. Consequentially, they are parsed like normal content, despite their special meaning.
+;;;; Configuration, on the other hand, exists the same in every
+;;;; language. Their interpretation is not modified by any arguments
+;;;; so key-value pairs on the same line as the configuration variable
+;;;; declaration are ignored. Depending on the variable, the lines
+;;;; following will be interpreted differently. A detailed explanation
+;;;; of the configuration variables can be seen in the README.
+
+;;;; Two pieces of configuration are unlike the others in that they
+;;;; also have languages associated with them: :SLUG and
+;;;; :DIRECTORY-SLUG. These are the strings that the URLS for a given
+;;;; page are created with, :SLUG being the URL-name of an actual
+;;;; page, while :DIRECTORY-SLUG is the URL-name of the directory in
+;;;; which pages reside. Consequentially, they are parsed like normal
+;;;; content, despite their special meaning.
 (export
  '(parse-content
    markup
@@ -22,11 +58,13 @@
    *environment*
    get-data))
 
-;;;; Data is named and stored in a plist referred to as an "environment". Data appears either in the form:
+;;;; Data is named and stored in a plist referred to as an
+;;;; "environment". Data appears either in the form:
 ;;;; Value
 ;;;; Or
 ;;;; ({Language-keyword (content &rest arguments)}+)
-;;;; The former referring to a piece of configuration, while the latter refers to a piece of content (or a slug).
+;;;; The former referring to a piece of configuration, while the
+;;;; latter refers to a piece of content (or a slug).
 
 (defparameter *environment*
   '(:languages (:en)
