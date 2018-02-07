@@ -313,21 +313,17 @@ using pandoc."
 a string understood by pandoc. *PANDOC-SUPPORTED-ARGS* is used for
 this mapping."
   (apply #'join-strings " "
-   (iter (for (supported-arg fn) on *pandoc-supported-args* by #'cddr)
-	 (if-let ((val (or (getf args supported-arg)
-			   (getf *environment* supported-arg))))
-	   (collect (funcall fn val))))))
+         (iter (for (supported-arg fn) on *pandoc-supported-args* by #'cddr)
+               (if-let ((val (or (getf args supported-arg)
+                                 (getf *environment* supported-arg))))
+                 (collect (funcall fn val))))))
 
 (defun pandoc-process (string &optional args)
   "String &optional (Plist) -> String
 Pass the given STRING and ARGS through pandoc given *ENVIRONMENT*."
-  (with-open-temporary-file (s :direction :output)
-  (iter (for char in-string string)
-	  (write-char char s))
-    (progn
-      (file-position s 0)
-      (trim (asdf/interface::run-program 
-             (join-strings " " "pandoc"
-                           (generate-pandoc-args args)
-                           (namestring (pathname s)))
-             :output :string)))))
+  (let ((command (concatenate 'string
+                              "pandoc "
+                              (generate-pandoc-args args))))
+    (uiop:run-program command
+                      :input (make-string-input-stream string)
+                      :output :string)))
