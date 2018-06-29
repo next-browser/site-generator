@@ -36,7 +36,7 @@
 (defvar *DB* nil "A hashtable that holds pertinent information regarding a site.")
 (defvar *DB-file* nil "The file in which *DB* is stored, as a plist.")
 
-(defvar *dependants* nil
+(defvar *dependents* nil
   "A list of (Entry . Paths) denoting entries that depend on the files in the paths.")
 (defvar *templates* nil
   "A list of templates path and write-date dependancy lists, as returned by WALK-TEMPLATES.")
@@ -123,7 +123,7 @@ Determine if the *ROOT-DIR* is a site-generator directory."
   "nil -> nil
 Perform the steps necessary to ensure that the database is up to date."
   (setf *templates* (walk-templates)
-	*dependants* nil
+	*dependents* nil
 	*new-pages* nil)
   (walk-site *content-dir* nil nil)
   (resolve-dependencies)
@@ -255,7 +255,7 @@ Update the *DB* ENTRY of FILE when the given content file is new or has been upd
 	  (when (not entry)
 	    (push relative-path *new-pages*)))
 	(when-let ((dependencies (get-data :depends)))
-	  (push (cons entry dependencies) *dependants*)))))
+	  (push (cons entry dependencies) *dependents*)))))
 
 (defun needs-update ()
   "nil -> ((Pathname Entry (Pathname)))
@@ -266,7 +266,7 @@ Return a list of all the (file-path Entry (configs)) pairs from the *DB* that ne
 
 (defun resolve-dependencies ()
   "nil -> nil
-For each Entry in *DEPENDANTS*, check if its dependants have changed and, if any have, and set their NEEDS-UPDATE to T."
+For each Entry in *DEPENDENTS*, check if its dependants have changed and, if any have, and set their NEEDS-UPDATE to T."
   (let+ ((paths (iter (for (path entry) in-hashtable *db*)
 		      (collect (cons (namestring path) entry))))
 	 ((&flet dependency-changed-p (dependencies)
@@ -275,7 +275,7 @@ For each Entry in *DEPENDANTS*, check if its dependants have changed and, if any
 			(when (and (equal (search dependency path) 0)
 				   (content-entry-needs-update entry))
 			  (return-from dependency-changed-p t)))))))
-    (iter (for (entry . dependencies) in *dependants*)
+    (iter (for (entry . dependencies) in *dependents*)
 	  (when (dependency-changed-p dependencies)
 	    (setf (content-entry-needs-update entry) t)))))
 
